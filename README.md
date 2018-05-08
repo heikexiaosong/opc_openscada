@@ -33,9 +33,6 @@ mvn clean install -Dmaven.test.skip=true
 
 ## OPC Server 测试环境搭建
 测试环境OPC Server可以使用 [MatrikonOPC Simulation Server](https://www.matrikonopc.cn/products/opc-drivers/opc-simulation-server.aspx)
-
-OPC Server:
-
 - MatrikonOPC模拟服务器是一个可以为您提供仿真OPC实时数据、OPC历史数据以及OPC报警事件信息的免费实用工具。
 - MatrikonOPC模拟服务器可以生成随机值、线性值、阶梯值。同时, 该服务器还可提供了以“传递水桶式” 算法生成的数据项类, 可作为控制逻辑测试。
 
