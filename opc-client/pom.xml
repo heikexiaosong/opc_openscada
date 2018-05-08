@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.gavel.parent</groupId>
+		<artifactId>gavel-parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../parent</relativePath>
+	</parent>
+
+	<groupId>com.gavel.platform</groupId>
+	<artifactId>opc-client</artifactId>
+	<name>opc-client</name>
+	<version>0.0.1</version>
+	<packaging>jar</packaging>
+	<url>http://maven.apache.org</url>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.compile.version>1.7</project.compile.version>
+
+		<logback.version>1.2.3</logback.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>19.0</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>${logback.version}</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>local-artifacts.thirdparty</groupId>
+			<artifactId>jcifs</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>local-artifacts.thirdparty</groupId>
+			<artifactId>org.openscada.jinterop.core</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>local-artifacts.thirdparty</groupId>
+			<artifactId>org.openscada.jinterop.deps</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>local-artifacts.thirdparty</groupId>
+			<artifactId>org.openscada.opc.lib</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>local-artifacts.thirdparty</groupId>
+			<artifactId>org.openscada.opc.dcom</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+   </dependencies>
+
+</project>
