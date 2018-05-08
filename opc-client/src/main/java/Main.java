@@ -7,6 +7,10 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * OPC server tag 数据读取
+ *
+ */
 public class Main {
 
     public static void main(String[] args) throws Exception {
@@ -15,26 +19,26 @@ public class Main {
         Logger.getLogger ( "org.jinterop" ).setLevel(Level.WARNING);
 
         final ConnectionInformation ci = new ConnectionInformation();
-        ci.setHost("localhost");
-        ci.setDomain("");
-        ci.setUser("opc");
-        ci.setPassword("opc");
+        ci.setHost(Env.HOST);
+        ci.setDomain(Env.DOMAIN);
+        ci.setUser(Env.USER);
+        ci.setPassword(Env.PASSWORD);
 
-        //ci.setProgId("Matrikon.OPC.Simulation");
-        ci.setClsid("f8582cf2-88fb-11d0-b850-00c0f0104305"); // if ProgId is not working, try it using the Clsid instead
+        //ci.setProgId(Env.PROGID);
+        ci.setClsid(Env.CLSID); // if ProgId is not working, try it using the Clsid instead
 
-        final Server server = new Server(ci, Executors.newSingleThreadScheduledExecutor());
+        final Server server = new Server(ci, Executors.newScheduledThreadPool(10));
         try {
             server.connect();
 
             // add sync access, poll every 500 ms
-            final AccessBase access = new SyncAccess(server, 500);
+            final AccessBase access = new SyncAccess(server, 200);
 
             access.addItem("Random.UInt4", new DataCallback() {
                 @Override
                 public void changed(Item item, ItemState state) {
                     try {
-                        System.out.println(state.getTimestamp().getTime() + " ==> " + item.getGroup().getName() + ", " + item.getId() + "]: " +  state.getValue().getObjectAsUnsigned().getValue());
+                        System.out.println(Thread.currentThread().getName() + " - " + state.getTimestamp().getTime() + " ==> " + item.getGroup().getName() + ", " + item.getId() + "]: " +  state.getValue().getObjectAsUnsigned().getValue());
                     } catch (JIException e) {
                         e.printStackTrace();
                     }
@@ -45,7 +49,7 @@ public class Main {
                 @Override
                 public void changed(Item item, ItemState state) {
                     try {
-                        System.out.println(state.getTimestamp().getTime() + " ==> [" + item.getGroup().getName() + ", " + item.getId() + "]: " + state.getValue().getObjectAsString2());
+                        System.out.println(Thread.currentThread().getName() + " - " + state.getTimestamp().getTime() + " ==> [" + item.getGroup().getName() + ", " + item.getId() + "]: " + state.getValue().getObjectAsString2());
                     } catch (JIException e) {
                         e.printStackTrace();
                     }
