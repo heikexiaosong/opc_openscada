@@ -60,3 +60,15 @@ OPC Server端目前常见的有以下几种协议:
 - 纯Java编写，具有跨平台特性
 - 全部基于`DCOM`实现
 - 目前只支持DA 2.0协议，3.0协议的支持还在开发中
+
+## Issue:
+Access is denied error
+When you get an
+
+"Access is denied. [0x00000005]"
+error, apply the following patch to the registry:
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
+create or modify 32-bit DWORD: LocalAccountTokenFilterPolicy
+set the value to: 1
+Credit to Arturas Sirvinskas (comments below)

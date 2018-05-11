@@ -1,3 +1,5 @@
+package com.gavel.opcclient;
+
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
