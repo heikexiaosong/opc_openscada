@@ -35,7 +35,7 @@ public class OPCItemGroupRead {
             final Group group = opcClient.getServer().addGroup( "group1" );
             group.setActive(true);
 
-            List<String> itemids = opcClient.getItemids();
+            List<String> itemids = opcClient.getItemids("Channel1.Device1.Tag*");
             Map<String, Item> itemMap =  group.addItems(itemids.toArray(new String[itemids.size()]));
 
             final Item[] items = new Item[itemMap.size()];

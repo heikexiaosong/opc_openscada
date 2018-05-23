@@ -94,6 +94,14 @@
 			<version>1.0.0</version>
 		</dependency>
 
-   </dependencies>
+		<!-- h2 数据库 -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.4.196</version>
+		</dependency>
+
+
+	</dependencies>
 
 </project>

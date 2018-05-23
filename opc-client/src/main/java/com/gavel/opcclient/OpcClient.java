@@ -44,7 +44,7 @@ public class OpcClient {
 
   }
 
-  public List<String> getItemids() throws Exception {
+  public List<String> getItemids(final String filterCriteria) throws Exception {
     if (server == null) {
       throw new Exception("OPC Server Info not init.");
     }
@@ -52,7 +52,7 @@ public class OpcClient {
     final BaseBrowser flatBrowser = server.getFlatBrowser();
     itemids.clear();
     if (flatBrowser != null) {
-      for (final String item : server.getFlatBrowser().browse("Channel1.Device1.Tag*")) {
+      for (final String item : server.getFlatBrowser().browse(filterCriteria)) {
         itemids.add(item);
       }
     }

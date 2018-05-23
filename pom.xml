@@ -10,7 +10,7 @@
 
     <modules>
         <module>./localSetup</module>
-		<module>./parent</module>
+		    <module>./parent</module>
         <module>./opc-client</module>
     </modules>
 </project>

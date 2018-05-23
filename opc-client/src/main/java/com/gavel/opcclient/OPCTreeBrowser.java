@@ -75,7 +75,7 @@ public class OPCTreeBrowser {
         try {
             opcClient.connect();
 
-            List<String> itemids = opcClient.getItemids();
+            List<String> itemids = opcClient.getItemids("Channel1.Device1.Tag*");
 
             for (int i = 0; i < itemids.size(); i++) {
                 System.out.println("[" + (i+1) + "]item: " + itemids.get(i));
