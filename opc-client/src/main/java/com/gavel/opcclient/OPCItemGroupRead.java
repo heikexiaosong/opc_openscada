@@ -32,7 +32,7 @@ public class OPCItemGroupRead {
         try {
             opcClient.connect();
 
-            final Group group = opcClient.getServer().addGroup( "group1" );
+            final Group group = opcClient.getServer().addGroup( "group_test" );
             group.setActive(true);
 
             List<String> itemids = opcClient.getItemids("Channel1.Device1.Tag*");
@@ -56,7 +56,7 @@ public class OPCItemGroupRead {
                         long timestamp = System.currentTimeMillis();
                         msg.append(calendar.getTime()).append("(").append(timestamp%1000).append("): ");
                         Map<Item, ItemState> itemItemStateMap = group.read(false, items);
-                        msg.append("Read: " + (System.currentTimeMillis() - timestamp) + " ms, ");
+                        msg.append("[Item: ").append(itemItemStateMap.size()).append("]Read: " + (System.currentTimeMillis() - timestamp) + " ms, ");
                         timestamp = System.currentTimeMillis();
                         for (Item item : itemItemStateMap.keySet()) {
                             ItemState state = itemItemStateMap.get(item);
@@ -81,7 +81,7 @@ public class OPCItemGroupRead {
 
 //                    System.out.println(Thread.currentThread().getName() + " - "
 //                        + state.getTimestamp().getTime() + " ==> [Group: " + item.getGroup().getName() + ", ItemId: "
-//                        + item.getId() + "]: " +  state.getValue().getType() + " - " + value);
+//                        + item.getId() + "][Quality" + state.getQuality() + "]: " +  state.getValue().getType() + " - " + value);
                             } catch (JIException e) {
                                 e.printStackTrace();
                             }
@@ -92,13 +92,13 @@ public class OPCItemGroupRead {
                         e.printStackTrace();
                     }
                     System.out.println(msg);
-
                 }
             }, 5000, 800, TimeUnit.MILLISECONDS);
 
             // wait a little bit
-            Thread.sleep(30 * 1000);
+            Thread.sleep(15 * 1000);
             writeThread.shutdownNow();
+
 
         } catch (final JIException e) {
             e.printStackTrace();
