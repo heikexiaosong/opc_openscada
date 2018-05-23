@@ -10,9 +10,9 @@ public class Env {
 
     public static final String PASSWORD = "gavel777";
 
-    public static final String CLSID = "F8582CF2-88FB-11D0-B850-00C0F0104305";
+    public static final String CLSID =  "B3AF0BF6-4C0C-4804-A122-6F3B160F4397"; //"B3AF0BF6-4C0C-4804-A122-6F3B160F4397";
 
-    public static final String PROGID = "Matrikon.OPC.Simulation.1";
+    public static final String PROGID = "Kepware.KEPServerEX.V5";
 
 
 

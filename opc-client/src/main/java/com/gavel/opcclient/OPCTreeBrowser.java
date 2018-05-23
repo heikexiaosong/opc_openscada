@@ -1,6 +1,7 @@
 package com.gavel.opcclient;
 
 import java.net.UnknownHostException;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,7 +21,7 @@ import org.openscada.opc.lib.da.browser.TreeBrowser;
 public class OPCTreeBrowser {
 
     private static void dumpLeaf(final String prefix, final Leaf leaf) {
-        System.out.println(prefix + "Leaf: " + leaf.getName() + " [" + leaf.getItemId() + "]");
+        //System.out.println(prefix + "Leaf: " + leaf.getName() + " [" + leaf.getItemId() + "]");
     }
 
     private static void dumpBranch(final String prefix, final Branch branch) {
@@ -32,7 +33,17 @@ public class OPCTreeBrowser {
         for (int i = 0; i < level; i++) {
             sb.append("  ");
         }
+
+        StringBuilder msg = new StringBuilder("################################ Branch: ").append(branch.getName());
+        Branch curBranch = branch.getParent();
+        while ( curBranch!=null){
+            msg.append(" --> ").append(curBranch.getName());
+            curBranch = curBranch.getParent();
+        }
+        System.out.println(msg);
+
         final String indent = sb.toString();
+
 
         for (final Leaf leaf : branch.getLeaves()) {
             dumpLeaf(indent, leaf);
@@ -60,37 +71,34 @@ public class OPCTreeBrowser {
         // 关闭初始化日志信息
         Logger.getLogger("org.jinterop").setLevel(Level.WARNING);
 
-        final ConnectionInformation ci = new ConnectionInformation();
-        ci.setHost(Env.HOST);
-        ci.setDomain(Env.DOMAIN);
-        ci.setUser(Env.USER);
-        ci.setPassword(Env.PASSWORD);
-        ci.setClsid(Env.CLSID);
-
-        // create a new server
-        final Server server = new Server(ci, Executors.newSingleThreadScheduledExecutor());
+        OpcClient opcClient = OpcClient.buildOpcClient();
         try {
-            server.connect();
+            opcClient.connect();
 
-            // browse flat
-            final BaseBrowser flatBrowser = server.getFlatBrowser();
-            if (flatBrowser != null) {
-                for (final String item : server.getFlatBrowser().browse("")) {
-                    System.out.println("item: " + item);
-                }
-            }
+            List<String> itemids = opcClient.getItemids();
 
-            // browse tree
-            final TreeBrowser treeBrowser = server.getTreeBrowser();
-            if (treeBrowser != null) {
-                dumpTree(treeBrowser.browse(), 0);
+            for (int i = 0; i < itemids.size(); i++) {
+                System.out.println("[" + (i+1) + "]item: " + itemids.get(i));
             }
+//            // browse flat
+//            final BaseBrowser flatBrowser = server.getFlatBrowser();
+//            if (flatBrowser != null) {
+//                for (final String item : server.getFlatBrowser().browse("")) {
+//                    System.out.println("item: " + item);
+//                }
+//            }
+
+//            // browse tree
+//            final TreeBrowser treeBrowser = server.getTreeBrowser();
+//            if (treeBrowser != null) {
+//                dumpTree(treeBrowser.browse(), 0);
+//            }
 
             // browse tree manually
-            browseTree("", treeBrowser, new Branch());
+            //browseTree("", treeBrowser, new Branch());
         } catch (final JIException e) {
             e.printStackTrace();
-            System.out.println(String.format("%08X: %s", e.getErrorCode(), server.getErrorMessage(e.getErrorCode())));
+            System.out.println(String.format("%08X: %s", e.getErrorCode()));// server.getErrorMessage(e.getErrorCode()))
         }
     }
 }
