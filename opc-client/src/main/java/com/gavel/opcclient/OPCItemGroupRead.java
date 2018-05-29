@@ -93,13 +93,15 @@ public class OPCItemGroupRead {
                     }
                     System.out.println(msg);
                 }
-            }, 5000, 800, TimeUnit.MILLISECONDS);
+            }, 1000, 800, TimeUnit.MILLISECONDS);
 
             // wait a little bit
-            Thread.sleep(15 * 1000);
+            boolean loop = true;
+            while ( loop ){
+                Thread.sleep(15 * 1000);
+            }
+
             writeThread.shutdownNow();
-
-
         } catch (final JIException e) {
             e.printStackTrace();
             System.out.println(String.format("%08X: %s", e.getErrorCode())); //, server.getErrorMessage(e.getErrorCode())
