@@ -133,7 +133,7 @@ public class OPCItemGroupRead {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    msg.append(ouput);
+                    msg.append("\n").append(ouput);
                 }
 
                 @Override
