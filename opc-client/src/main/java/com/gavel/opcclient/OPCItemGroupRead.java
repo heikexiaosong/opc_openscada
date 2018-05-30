@@ -1,5 +1,6 @@
 package com.gavel.opcclient;
 
+import com.gavel.PropertiesUtil;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -46,8 +47,10 @@ public class OPCItemGroupRead {
         try {
             opcClient.connect();
 
-            System.out.print("获取OPC Sercer Tag 列表 ....... ");
-            List<String> itemids = opcClient.getItemids("Channel1.Device1.Tag*");
+            String filterCriteria = PropertiesUtil.getValue("tag.filter", "Channel1.Device*.Tag*");
+
+            System.out.print("获取OPC Sercer Tag 列表[Filter Criteria: " + filterCriteria + "] ....... ");
+            List<String> itemids = opcClient.getItemids(filterCriteria);
             System.out.println(  itemids.size() + " 个. [SUCCESS]\n");
             int i = 0;
 
@@ -84,17 +87,14 @@ public class OPCItemGroupRead {
                     try {
                         long timestamp = System.currentTimeMillis();
                         calendar.setTimeInMillis(System.currentTimeMillis());
-                        msg.append("[Group: ").append(group.getName()).append(", Tags: ").append(items==null ? 0 : items.length);
                         if ( sync ){
-                            msg.append("]同步读取 -- 实时数据\n");
+                            msg.append("\n    [").append(DATE_FORMAT.format(calendar.getTime())).append("][同步读取 -- 实时数据]");
                         } else {
-                            msg.append("]异步读取 -- 使用缓存\n");
+                            msg.append("\n    [").append(DATE_FORMAT.format(calendar.getTime())).append("][异步读取 -- 使用缓存]");
                         }
-                        msg.append(DATE_FORMAT.format(calendar.getTime())).append("]");
                         Map<Item, ItemState> itemItemStateMap = group.read(sync, items);
                         calendar.setTimeInMillis(System.currentTimeMillis());
-                        msg.append("[服务端响应: ").append(DATE_FORMAT.format(calendar.getTime())).append("]");
-                        msg.append("[Item: ").append(itemItemStateMap.size()).append("]Read Cost Time: " + (System.currentTimeMillis() - timestamp) + " ms");
+                        msg.append("Cost Time: " + (System.currentTimeMillis() - timestamp) + " ms");
                         timestamp = System.currentTimeMillis();
                         ouput.delete(0, ouput.length());
                         for (Item item : itemItemStateMap.keySet()) {
@@ -121,9 +121,8 @@ public class OPCItemGroupRead {
                                 if ( ouput.length() == 0 ) {
 
                                     //Wed May 30 10:07:20 CST 2018 ==> [Group: group_test, ItemId: Channel1.Device1.Tag6397][Quality192]: 18 - 2265
-                                    ouput.append("[Example][Timestamp: ").append(DATE_FORMAT.format(state.getTimestamp().getTime())).append("][Group: " + item
-                                        .getGroup().getName() + ", ItemId: "
-                                        + item.getId() + "][Quality: " + state.getQuality() + "]Value: " + value);
+                                    ouput.append("    ").append(item.getId()).append(" - [时间戳: ")
+                                        .append(DATE_FORMAT.format(state.getTimestamp().getTime())).append("][Quality: " + state.getQuality() + "] -- Value: " + value);
                                 }
 
 
@@ -131,26 +130,30 @@ public class OPCItemGroupRead {
                                 e.printStackTrace();
                             }
                         }
-
-                        msg.append("Parse Value: " + (System.currentTimeMillis() - timestamp) + " ms");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    System.out.println(msg);
-                    System.out.println(ouput);
+                    msg.append(ouput);
                 }
 
                 @Override
                 public void run() {
                     StringBuilder msg = new StringBuilder();
                     for (Entry<Group, Item[]> entry : groupItemMap.entrySet()) {
-                        msg.delete(0, msg.length());
-                        readGroupTags(entry.getKey(), entry.getValue(), false, msg);
+                        try {
+                            msg.delete(0, msg.length());
 
-                        msg.delete(0, msg.length());
-                        readGroupTags(entry.getKey(), entry.getValue(), true, msg);
+                            msg.append("[分组: ").append(entry.getKey().getName()).append(", Tags数: ").append(entry.getValue()==null ? 0 : entry.getValue().length).append("]");
+                            readGroupTags(entry.getKey(), entry.getValue(), false, msg);
 
-                        System.out.println("");
+                            readGroupTags(entry.getKey(), entry.getValue(), true, msg);
+
+                            msg.append("\n");
+                            System.out.println(msg);
+                        } catch (Exception e){
+                            System.out.println(e.getMessage());
+                        }
+
                     }
                 }
             }, 1000, 800, TimeUnit.MILLISECONDS);
