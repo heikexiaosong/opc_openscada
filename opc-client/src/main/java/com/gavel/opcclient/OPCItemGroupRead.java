@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jinterop.dcom.common.JIException;
@@ -22,6 +25,9 @@ import org.openscada.opc.lib.da.browser.TreeBrowser;
  *
  */
 public class OPCItemGroupRead {
+
+    private static final Lock LOCK = new ReentrantLock();
+    private static final Condition STOP = LOCK.newCondition();
 
     public static void main(String[] args) throws Exception {
 
@@ -87,7 +93,7 @@ public class OPCItemGroupRead {
                             }
                         }
 
-                        msg.append("Show: " + (System.currentTimeMillis() - timestamp) + " ms\n");
+                        msg.append("Parse Value: " + (System.currentTimeMillis() - timestamp) + " ms\n");
                     } catch (Exception e){
                         e.printStackTrace();
                     }
@@ -95,13 +101,18 @@ public class OPCItemGroupRead {
                 }
             }, 1000, 800, TimeUnit.MILLISECONDS);
 
-            // wait a little bit
-            boolean loop = true;
-            while ( loop ){
-                Thread.sleep(15 * 1000);
+
+            //主线程阻塞等待，守护线程释放锁后退出
+            try {
+                LOCK.lock();
+                STOP.await();
+            } catch (InterruptedException e) {
+                System.out.println(" service   stopped, interrupted by other thread: " + e.getMessage());
+            } finally {
+                LOCK.unlock();
+                writeThread.shutdownNow();
             }
 
-            writeThread.shutdownNow();
         } catch (final JIException e) {
             e.printStackTrace();
             System.out.println(String.format("%08X: %s", e.getErrorCode())); //, server.getErrorMessage(e.getErrorCode())
