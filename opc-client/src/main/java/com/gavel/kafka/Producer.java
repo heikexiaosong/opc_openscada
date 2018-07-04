@@ -1,24 +1,24 @@
 package com.gavel.kafka;
 
 import com.gavel.opcclient.DataPointItem;
-import com.google.common.base.Charsets;
-import com.google.common.base.Splitter;
-import com.google.common.io.Files;
-import org.apache.commons.lang3.time.DateUtils;
+import com.google.common.collect.Lists;
+import com.google.gson.Gson;
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.log4j.Logger;
 
-import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.Random;
 
 public class Producer {
 
-    static Logger log = Logger.getLogger(Producer.class);
+    private static Logger log = Logger.getLogger(Producer.class);
+
+    private static Gson gson = new Gson();
 
     /*
 初始化配置
@@ -38,36 +38,53 @@ public class Producer {
         return props;
     }
 
-    public static KafkaProducer<String, DataPointItem> getProducer(){
+    public static KafkaProducer<String, String> getProducer(){
 
         Properties configs = initConfig();
-        KafkaProducer<String, DataPointItem> producer = new KafkaProducer<String, DataPointItem>(configs);
+        KafkaProducer<String, String> producer = new KafkaProducer<String, String>(configs);
 
         return producer;
 
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args)  {
 
-        KafkaProducer<String, DataPointItem> producer = getProducer();
-
-        ProducerRecord<String, DataPointItem> record = new ProducerRecord<String, DataPointItem>("sl_env", null);
-        //record.headers().add("name", name.getBytes());
-        //record.headers().add("code", code.getBytes());
-
-        // 发送消息
-        producer.send(record, new Callback() {
-            @Override
-            public void onCompletion(RecordMetadata recordMetadata, Exception e) {
-                if (null != e){
-                    log.info("send error" + e.getMessage());
-                }else {
-                    System.out.println(String.format("offset:%s,partition:%s",recordMetadata.offset(),recordMetadata.partition()));
-                }
+        Random random = new Random();
+        while (true){
+            List<DataPointItem> dataPointItemList = Lists.newArrayList(new DataPointItem("device.status.demo", new Date().getTime(), random.nextDouble()));
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        });
+            dataPointItemList.add(new DataPointItem("device.status.demo", new Date().getTime(), random.nextDouble()));
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            dataPointItemList.add(new DataPointItem("device.status.demo", new Date().getTime() , random.nextDouble()));
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            dataPointItemList.add(new DataPointItem("device.status.demo", new Date().getTime(), random.nextDouble()));
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-        producer.close();
+            KafkaUtils.sendMessage(dataPointItemList);
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
 }

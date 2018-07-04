@@ -1,5 +1,7 @@
 package com.gavel.kafka;
 
+import com.alibaba.fastjson.JSONArray;
+import com.gavel.opcclient.DataPointItem;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -7,6 +9,7 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.log4j.Logger;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 public class Consumer {
@@ -38,7 +41,12 @@ public class Consumer {
         while ( true ) {
             ConsumerRecords<String, String> records = consumer.poll(10);
             for (ConsumerRecord<String, String> record : records) {
+                String jsonStr = record.value();
+                List<DataPointItem> dataPointItemList = JSONArray.parseArray(jsonStr, DataPointItem.class);
                 System.out.println(record);
+                for (DataPointItem dataPointItem : dataPointItemList) {
+                    System.out.println(dataPointItem);
+                }
             }
         }
     }

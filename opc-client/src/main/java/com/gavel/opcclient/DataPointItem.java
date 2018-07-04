@@ -1,6 +1,12 @@
 package com.gavel.opcclient;
 
-public class DataPointItem {
+import com.google.common.base.MoreObjects;
+
+import java.io.Serializable;
+
+public class DataPointItem implements Serializable {
+
+    private static final long serialVersionUID = 123L;
 
     private String itemId;
 
@@ -36,5 +42,14 @@ public class DataPointItem {
 
     public void setValue(Object value) {
         this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("itemId", itemId)
+                .add("timestamp", timestamp)
+                .add("value", value)
+                .toString();
     }
 }

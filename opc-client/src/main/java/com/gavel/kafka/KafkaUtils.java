@@ -1,6 +1,7 @@
 package com.gavel.kafka;
 
 import com.gavel.opcclient.DataPointItem;
+import com.google.gson.Gson;
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -16,29 +17,30 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class KafkaUtils {
 
+
+    private static Gson gson = new Gson();
+
     private static Logger LOG = LoggerFactory.getLogger(Producer.class);
 
     public static boolean sendMessage(List<DataPointItem> dataPointItems){
-        KafkaProducer<String, DataPointItem> producer = Producer.getProducer();
+        KafkaProducer<String, String> producer = Producer.getProducer();
 
         final AtomicBoolean result = new AtomicBoolean(true);
-        for (DataPointItem dataPointItem : dataPointItems) {
-            ProducerRecord<String, DataPointItem> record = new ProducerRecord<String, DataPointItem>("device_status", dataPointItem);
-            //record.headers().add("name", name.getBytes());
-            //record.headers().add("code", code.getBytes());
-            // 发送消息
-            producer.send(record, new Callback() {
-                @Override
-                public void onCompletion(RecordMetadata recordMetadata, Exception e) {
-                    if (null != e){
-                        LOG.info("send error" + e.getMessage());
-                        result.set(false);
-                    }else {
-                        System.out.println(String.format("offset:%s,partition:%s",recordMetadata.offset(),recordMetadata.partition()));
-                    }
+        ProducerRecord<String, String> record = new ProducerRecord<String, String>("device_status", gson.toJson(dataPointItems));
+        //record.headers().add("name", name.getBytes());
+        //record.headers().add("code", code.getBytes());
+        // 发送消息
+        producer.send(record, new Callback() {
+            @Override
+            public void onCompletion(RecordMetadata recordMetadata, Exception e) {
+                if (null != e){
+                    LOG.info("send error" + e.getMessage());
+                    result.set(false);
+                }else {
+                    System.out.println(String.format("offset:%s,partition:%s",recordMetadata.offset(),recordMetadata.partition()));
                 }
-            });
-        }
+            }
+        });
         producer.close();
         return result.get();
     }
