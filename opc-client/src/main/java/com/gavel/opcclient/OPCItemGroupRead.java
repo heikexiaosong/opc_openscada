@@ -4,10 +4,7 @@ import com.gavel.PropertiesUtil;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -18,6 +15,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.gavel.kafka.KafkaUtils;
 import org.jinterop.dcom.common.JIException;
 import org.openscada.opc.lib.da.Group;
 import org.openscada.opc.lib.da.Item;
@@ -97,6 +96,8 @@ public class OPCItemGroupRead {
                         msg.append("Cost Time: " + (System.currentTimeMillis() - timestamp) + " ms");
                         timestamp = System.currentTimeMillis();
                         ouput.delete(0, ouput.length());
+
+                        List<DataPointItem> dataPointItems = new ArrayList<DataPointItem>();
                         for (Item item : itemItemStateMap.keySet()) {
                             ItemState state = itemItemStateMap.get(item);
                             try {
@@ -119,17 +120,20 @@ public class OPCItemGroupRead {
                                 }
 
                                 if ( ouput.length() == 0 ) {
-
                                     //Wed May 30 10:07:20 CST 2018 ==> [Group: group_test, ItemId: Channel1.Device1.Tag6397][Quality192]: 18 - 2265
                                     ouput.append("    ").append(item.getId()).append(" - [时间戳: ")
                                         .append(DATE_FORMAT.format(state.getTimestamp().getTime())).append("][Quality: " + state.getQuality() + "] -- Value: " + value);
                                 }
+
+                                dataPointItems.add(new DataPointItem(item.getId(),  state.getTimestamp().getTimeInMillis(), value));
 
 
                             } catch (JIException e) {
                                 e.printStackTrace();
                             }
                         }
+
+                        KafkaUtils.sendMessage(dataPointItems);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -144,7 +148,7 @@ public class OPCItemGroupRead {
                             msg.delete(0, msg.length());
 
                             msg.append("[分组: ").append(entry.getKey().getName()).append(", Tags数: ").append(entry.getValue()==null ? 0 : entry.getValue().length).append("]");
-                            readGroupTags(entry.getKey(), entry.getValue(), false, msg);
+                            //readGroupTags(entry.getKey(), entry.getValue(), false, msg);
 
                             readGroupTags(entry.getKey(), entry.getValue(), true, msg);
 
@@ -163,8 +167,7 @@ public class OPCItemGroupRead {
                 LOCK.lock();
                 STOP.await();
             } catch (InterruptedException e) {
-                System.out
-                    .println(" service   stopped, interrupted by other thread: " + e.getMessage());
+                System.out.println(" service   stopped, interrupted by other thread: " + e.getMessage());
             } finally {
                 LOCK.unlock();
                 writeThread.shutdownNow();
@@ -172,8 +175,7 @@ public class OPCItemGroupRead {
 
         } catch (final JIException e) {
             e.printStackTrace();
-            System.out.println(String
-                .format("%08X: %s", e.getErrorCode())); //, server.getErrorMessage(e.getErrorCode())
+            System.out.println(String.format("%08X: %s", e.getErrorCode())); //, server.getErrorMessage(e.getErrorCode())
         }
     }
 }
