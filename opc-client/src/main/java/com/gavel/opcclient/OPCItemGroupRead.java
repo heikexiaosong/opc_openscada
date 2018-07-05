@@ -63,18 +63,6 @@ public class OPCItemGroupRead {
             }
             groupItemMap.put(group, items);
 
-
-            final Group group_half = opcClient.getServer().addGroup("group_half");
-            group_half.setActive(true);
-            List<String> itemids_half = itemids.subList(0, itemids.size()/2);
-            Map<String, Item> itemHalfMap = group_half.addItems(itemids_half.toArray(new String[itemids_half.size()]));
-            final Item[] items_half = new Item[itemHalfMap.size()];
-            i = 0;
-            for (Item item : itemHalfMap.values()) {
-                items_half[i++] = item;
-            }
-            groupItemMap.put(group_half, items_half);
-
             final Calendar calendar = Calendar.getInstance();
             final StringBuilder ouput = new StringBuilder();
             // add a thread for writing a value every 3 seconds
