@@ -1,5 +1,6 @@
 package com.gavel.kafka;
 
+import com.gavel.PropertiesUtil;
 import com.gavel.opcclient.DataPointItem;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -26,7 +27,7 @@ public class Producer {
     private static Properties initConfig(){
 
         Properties props = new Properties();
-        props.put("bootstrap.servers", KafkaEnv.BROKER_LIST);
+        props.put("bootstrap.servers", PropertiesUtil.getValue("kafka.bootstrap.servers", "192.168.30.101:9092"));
         props.put("acks", "all");
         props.put("retries", 0);
         props.put("batch.size", 16384);

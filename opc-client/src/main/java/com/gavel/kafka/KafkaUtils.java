@@ -1,5 +1,6 @@
 package com.gavel.kafka;
 
+import com.gavel.PropertiesUtil;
 import com.gavel.opcclient.DataPointItem;
 import com.google.gson.Gson;
 import org.apache.kafka.clients.producer.Callback;
@@ -12,21 +13,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class KafkaUtils {
 
+    private static KafkaProducer<String, String> producer = Producer.getProducer();
 
     private static Gson gson = new Gson();
 
     private static Logger LOG = LoggerFactory.getLogger(Producer.class);
 
     public static boolean sendMessage(List<DataPointItem> dataPointItems){
-        KafkaProducer<String, String> producer = Producer.getProducer();
 
         final AtomicBoolean result = new AtomicBoolean(true);
-        ProducerRecord<String, String> record = new ProducerRecord<String, String>("device_status", gson.toJson(dataPointItems));
+        ProducerRecord<String, String> record = new ProducerRecord<String, String>(PropertiesUtil.getValue("kafka.topic", "device_status"), gson.toJson(dataPointItems));
         //record.headers().add("name", name.getBytes());
         //record.headers().add("code", code.getBytes());
         // 发送消息
@@ -41,7 +41,6 @@ public class KafkaUtils {
                 }
             }
         });
-        producer.close();
         return result.get();
     }
 }

@@ -1,6 +1,7 @@
 package com.gavel.kafka;
 
 import com.alibaba.fastjson.JSONArray;
+import com.gavel.PropertiesUtil;
 import com.gavel.opcclient.DataPointItem;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -26,7 +27,7 @@ public class Consumer {
 
     private static Properties initConfig(){
         Properties properties = new Properties();
-        properties.put("bootstrap.servers", KafkaEnv.BROKER_LIST);
+        properties.put("bootstrap.servers", PropertiesUtil.getValue("kafka.bootstrap.servers", "192.168.30.101:9092"));
         properties.put("group.id","0");
         properties.put("key.deserializer", StringDeserializer.class);
         properties.put("value.deserializer", StringDeserializer.class);
@@ -37,7 +38,7 @@ public class Consumer {
     }
 
     public static void main(String[] args) {
-        consumer.subscribe(Collections.singleton(KafkaEnv.TOPIC));
+        consumer.subscribe(Collections.singleton(PropertiesUtil.getValue("kafka.topic", "device_status")));
         while ( true ) {
             ConsumerRecords<String, String> records = consumer.poll(10);
             for (ConsumerRecord<String, String> record : records) {

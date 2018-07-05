@@ -133,7 +133,9 @@ public class OPCItemGroupRead {
                             }
                         }
 
-                        KafkaUtils.sendMessage(dataPointItems);
+                        long start = System.currentTimeMillis();
+                        boolean success = KafkaUtils.sendMessage(dataPointItems);
+                        ouput.append("\n[Item Size: " + dataPointItems.size()  + "][Result: " + success + "]Send Kafka Cost time: " + (System.currentTimeMillis() - start) + " ms");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -162,8 +164,9 @@ public class OPCItemGroupRead {
                 }
             }, 1000, 800, TimeUnit.MILLISECONDS);
 
-            //主线程阻塞等待，守护线程释放锁后退出
+
             try {
+                //主线程阻塞等待(守护线程释放锁后退出--不释放锁实现主线程不退出)
                 LOCK.lock();
                 STOP.await();
             } catch (InterruptedException e) {
